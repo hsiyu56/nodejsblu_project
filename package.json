@@ -1,0 +1,36 @@
+{
+  "name": "nodejsblu",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon dist/main.bundle.js",
+    "webpack": "webpack --progress -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "console-stamp": "^3.0.3",
+    "crypto": "^1.0.1",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "express-session": "^1.17.1",
+    "helmet": "^4.6.0",
+    "http-errors": "~1.6.3",
+    "module": "^1.2.5",
+    "mongoose": "^5.13.12",
+    "morgan": "~1.9.1",
+    "nodemailer": "^6.6.3",
+    "passport": "^0.4.1",
+    "pug": "^2.0.0-beta11",
+    "pug-code-gen": "^2.0.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^8.1.1",
+    "module-mapping-webpack-plugin": "^1.1.1",
+    "nodemon-webpack-plugin": "^4.5.2",
+    "webpack": "^5.31.2",
+    "webpack-cli": "^4.6.0",
+    "webpack-node-externals": "^2.5.2"
+  }
+}

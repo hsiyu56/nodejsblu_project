@@ -1,0 +1,43 @@
+meta(charset='utf-8')
+meta(name='viewport' content='width=device-width,initial-scale=1,shrink-to-fit=no')
+meta(name='description' content)
+meta(name='author' content='Mark Otto, Jacob Thornton, and Bootstrap contributors')
+meta(name='generator' content='Jekyll v4.1.1')
+title 登入
+//  Bootstrap core CSS 
+link(href='/stylesheets/bootstrap.min.css' rel='stylesheet')
+link(href='/stylesheets/color.css' rel='stylesheet')
+style.
+  .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+  
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+  
+//  Custom styles for this template 
+link(href='/stylesheets/signin.css' rel='stylesheet')
+//script(type="module" src='./javascripts/signin.js')
+body.yellow-c
+  main.form-signin
+    form#loginform(method='post')
+      div.text-center
+        img.mb-4(src='/images/Google_Contacts_icon.svg' width='72' height='72')
+      h1.h3.mb-3.font-weight-normal.text-center 登入
+      label.sr-only#phone(for='inputPhone') 電話
+      input#inputphone.form-control(type='input' placeholder='請輸入電話' name='username' required autofocus)
+      label.sr-only#num(for='inputPassword') 密碼
+      input#inputPassword.form-control(type='password' placeholder='請輸入密碼' name='password' required)
+      div.mb-3.text-center
+        a.btn(href='/register') 註冊
+        a.btn.disabled(href='/forget_pwd') 忘記密碼
+      button.btn.btn-lg.btn-primary.btn-block(type='submit') 登入
+      p.mt-5.mb-3.text-center © 臺東大學

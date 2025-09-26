@@ -1,0 +1,173 @@
+doctype html
+html(lang="zh-haunt-TW")
+  head
+    title 我的資料-上傳
+    meta(charset="utf-8")
+    style .fonts{font-family:"Microsoft JhengHei";}
+    link(href='/stylesheets/bootstrap.min.css' rel='stylesheet')
+    link(href='/stylesheets/color.css' rel='stylesheet')
+    link(href='/stylesheets/dashboard.css' rel='stylesheet')
+    link(href='/stylesheets/navbar-top-fixed.css' rel='stylesheet')
+    style.
+      .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+      }
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+  body.whitegreen-c
+    form
+      input#service(type="hidden", value="0xFFE0")
+      input#characteristic(type="hidden", value="0xFFE1") 
+      button#startNotifications.btn.btn-lg.btn-success 按我連接
+      button#stopNotifications.btn.btn-lg.btn-danger 停止連接
+      button.btn.btn-lg.btn-info(onclick="download('file.txt')") 點我下載txt
+
+    h3 顯示
+    div#output.output
+    div#content
+    div#status
+    textarea#log(name="read" cols="100%" rows="25%" disabled)
+    //pre#log
+
+    script.
+      var ChromeSamples = {
+          log: function() {
+            var line = Array.prototype.slice.call(arguments).map(function(argument) {
+              return typeof argument === 'string' ? argument : JSON.stringify(argument);
+            }).join(' ');
+      
+            document.querySelector('#log').textContent += line + '\n';
+          },
+      
+          clearLog: function() {
+            document.querySelector('#log').textContent = '';
+          },
+      
+          setStatus: function(status) {
+            document.querySelector('#status').textContent = status;
+          },
+      
+          setContent: function(newContent) {
+            var content = document.querySelector('#content');
+            while(content.hasChildNodes()) {
+              content.removeChild(content.lastChild);
+            }
+            content.appendChild(newContent);
+          }
+        };
+    script.
+      function download(filename) {
+        var content = document.getElementById("log").value;
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        };
+    script.
+      var myCharacteristic;
+      
+      async function onStartButtonClick() {
+        let serviceUuid = document.querySelector('#service').value;
+        if (serviceUuid.startsWith('0x')) {
+          serviceUuid = parseInt(serviceUuid);
+        }
+      
+        let characteristicUuid = document.querySelector('#characteristic').value;
+        if (characteristicUuid.startsWith('0x')) {
+          characteristicUuid = parseInt(characteristicUuid);
+        }
+      
+        try {
+          log('要求連接藍芽中...');
+          const device = await navigator.bluetooth.requestDevice({
+              filters: [{services: [serviceUuid]}]});
+      
+          log('Connecting to GATT Server...');
+          const server = await device.gatt.connect();
+      
+          log('Getting Service...');
+          const service = await server.getPrimaryService(serviceUuid);
+      
+          log('Getting Characteristic...');
+          myCharacteristic = await service.getCharacteristic(characteristicUuid);
+      
+          await myCharacteristic.startNotifications();
+
+          log('連接成功!');
+      
+          log('> Notifications started');
+          myCharacteristic.addEventListener('characteristicvaluechanged',
+              handleNotifications);
+        } catch(error) {
+          //log('Argh! ' + error);
+          log('連接失敗，請重新再試一次哦~');
+        }
+      }
+      
+      async function onStopButtonClick() {
+        if (myCharacteristic) {
+          try {
+            await myCharacteristic.stopNotifications();
+            log('> Notifications stopped');
+            myCharacteristic.removeEventListener('characteristicvaluechanged',
+                handleNotifications);
+          } catch(error) {
+            log('Argh! ' + error);
+          }
+        }
+      }
+      
+      function handleNotifications(event) {
+        let value = event.target.value;
+        let utf8decoder = new TextDecoder();
+
+        // Convert raw data bytes to hex values just for the sake of showing something.
+        // In the "real" world, you'd use data.getUint8, data.getUint16 or even
+        // TextDecoder to process raw data bytes.
+        
+        log(utf8decoder.decode(value));
+      }
+    script.
+      
+      document.querySelector('#startNotifications').addEventListener('click', function(event) {
+          event.stopPropagation();
+          event.preventDefault();
+      
+          if (isWebBluetoothEnabled()) {
+            ChromeSamples.clearLog();
+            onStartButtonClick();
+          }
+        });
+        document.querySelector('#stopNotifications').addEventListener('click', function(event) {
+          event.stopPropagation();
+          event.preventDefault();
+      
+          if (isWebBluetoothEnabled()) {
+            onStopButtonClick();
+          }
+        });    
+    script.
+      
+      log = ChromeSamples.log;
+      
+        function isWebBluetoothEnabled() {
+          if (navigator.bluetooth) {
+            return true;
+          } else {
+            ChromeSamples.setStatus('Web Bluetooth API is not available.\n' +
+                'Please make sure the "Experimental Web Platform features" flag is enabled.');
+            return false;
+          }
+        }

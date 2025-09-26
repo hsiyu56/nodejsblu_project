@@ -1,0 +1,221 @@
+html(lang="zh-haunt-TW")
+meta(name='viewport' content='width=device-width,initial-scale=1,shrink-to-fit=no')
+meta(name='description' content)
+meta(name='author' content)
+meta(name='generator' content)
+title 藍芽資料測試
+link(rel='canonical' href='https://getbootstrap.com/docs/4.6/examples/dashboard/')
+//  Bootstrap core CSS 
+link(href='/stylesheets/bootstrap.min.css' rel='stylesheet')
+link(href='/stylesheets/color.css' rel='stylesheet')
+link(href='/stylesheets/dashboard.css' rel='stylesheet')
+script(rel='/javascripts/bootstrap.min.js')
+script(rel='/javascripts/dashborad.js')
+style.
+  .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+  
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+body.whitegreen-c
+  nav.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0.shadow
+    a.navbar-brand.col-md-3.col-lg-2.mr-0.px-3(href='#') 藍芽資料測試
+    button.navbar-toggler.position-absolute.d-md-none.collapsed(type='button' data-toggle='collapse' data-target='#sidebarMenu' aria-controls='sidebarMenu' aria-expanded='false' aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    input.form-control.form-control-dark.w-100(type='text' placeholder='Search' aria-label='Search')
+    ul.navbar-nav.px-3
+      li.nav-item.text-nowrap
+        a.nav-link.disabled(href='/') 登出
+  .container-fluid
+    .row
+      nav#sidebarMenu.col-md-3.col-lg-2.d-md-block.bg-light.sidebar.collapse
+        .sidebar-sticky.pt-3.bru-c
+          ul.nav.flex-column
+            .col-md-12 
+              form
+                input#service(type="hidden", value="0xFFE0")
+                input#characteristic(type="hidden", value="0xFFE1") 
+                button#startNotifications.btn.btn-lg.btn-outline-success.btn-block 按我連接
+                <br><br>
+                button#stopNotifications.btn.btn-lg.btn-outline-danger.btn-block 停止連接
+                //<br><br>
+                //button.btn.btn-lg.btn-outline-info.btn-block(onclick="download('file.txt')") 點我下載txt
+
+      main.col-md-9.ml-sm-auto.col-lg-10.px-md-4(role='main')
+        .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom
+          h1.h2 顯示
+          .btn-toolbar.mb-2.mb-md-0
+        
+        div#output.output
+        div#content
+        div#status
+        textarea#log(name="read" cols="100%" rows="25%" disabled)
+        //pre#log
+          
+    script.
+      var ChromeSamples = {
+          log: function() {
+            var line = Array.prototype.slice.call(arguments).map(function(argument) {
+              return typeof argument === 'string' ? argument : JSON.stringify(argument);
+            }).join(' ');
+      
+            document.querySelector('#log').textContent += line + '\n';
+          },
+      
+          clearLog: function() {
+            document.querySelector('#log').textContent = '';
+          },
+      
+          setStatus: function(status) {
+            document.querySelector('#status').textContent = status;
+          },
+      
+          setContent: function(newContent) {
+            var content = document.querySelector('#content');
+            while(content.hasChildNodes()) {
+              content.removeChild(content.lastChild);
+            }
+            content.appendChild(newContent);
+          }
+        };
+    script.
+      function download(filename) {
+        var content = document.getElementById("log").value;
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        };
+    script.
+      var connectacc = false;
+      var myCharacteristic;
+      
+      async function onStartButtonClick() {
+        let serviceUuid = document.querySelector('#service').value;
+        if (serviceUuid.startsWith('0x')) {
+          serviceUuid = parseInt(serviceUuid);
+        }
+      
+        let characteristicUuid = document.querySelector('#characteristic').value;
+        if (characteristicUuid.startsWith('0x')) {
+          characteristicUuid = parseInt(characteristicUuid);
+        }
+      
+        try {
+          //log('要求連接藍芽中...');
+          const device = await navigator.bluetooth.requestDevice({
+              filters: [{services: [serviceUuid]}]});
+      
+          //log('Connecting to GATT Server...');
+          const server = await device.gatt.connect();
+      
+          //log('Getting Service...');
+          const service = await server.getPrimaryService(serviceUuid);
+      
+          //log('Getting Characteristic...');
+          myCharacteristic = await service.getCharacteristic(characteristicUuid);
+      
+          await myCharacteristic.startNotifications();
+
+          log('連接成功!');
+          cons show = document.createElement('show');
+          show.innerHTML = 'h1 正在偵測中, 請不要點選其他地方' + 'br' + 'textarea#log(name="read", cols="30", rows="10")' 
+          connectacc = True;
+      
+          //log('> Notifications started');
+          myCharacteristic.addEventListener('characteristicvaluechanged',
+              handleNotifications);
+        } catch(error) {
+          //log('Argh! ' + error);
+          log('連接失敗，請重新再試一次哦~');
+        }
+      }
+      
+      async function onStopButtonClick() {
+        if (myCharacteristic) {
+          try {
+            await myCharacteristic.stopNotifications();
+            log('停止連接');
+            connectacc = false;
+            myCharacteristic.removeEventListener('characteristicvaluechanged',
+                handleNotifications);
+            alert("這次行走了" + num + "步" + "感謝使用本產品")
+            top.location.href = '/'
+          } catch(error) {
+            log('Argh! ' + error);
+          }
+        }
+      }
+      
+      function handleNotifications(event) {
+        var num = 0;
+
+        let value = event.target.value;
+        let utf8decoder = new TextDecoder();
+
+        // Convert raw data bytes to hex values just for the sake of showing something.
+        // In the "real" world, you'd use data.getUint8, data.getUint16 or even
+        // TextDecoder to process raw data bytes.
+        var data = utf8decoder.decode(value);
+        var data1 = data.split(',');
+        //data1[0] = accel, data1[1] = c...+a...
+        var data2 = data1[1].split('c');
+        //data2[0] = 步數..., data2[1] = a...
+        var data3 = data2[0];
+        await if(connectacc == True){
+          while(true){
+            num = parseInt(data3) + num;
+            if(connectacc == false){
+              return(num);
+            }
+          }
+        }
+        await if(data2[1] == a){
+          //這邊寄出mail
+        }
+        log(data1[0]);
+      }
+    script.
+      
+      document.querySelector('#startNotifications').addEventListener('click', function(event) {
+          event.stopPropagation();
+          event.preventDefault();
+      
+          if (isWebBluetoothEnabled()) {
+            ChromeSamples.clearLog();
+            onStartButtonClick();
+          }
+        });
+        document.querySelector('#stopNotifications').addEventListener('click', function(event) {
+          event.stopPropagation();
+          event.preventDefault();
+      
+          if (isWebBluetoothEnabled()) {
+            onStopButtonClick();
+          }
+        });    
+    script.
+      
+      log = ChromeSamples.log;
+      
+        function isWebBluetoothEnabled() {
+          if (navigator.bluetooth) {
+            return true;
+          } else {
+            ChromeSamples.setStatus('Web Bluetooth API is not available.\n' +
+                'Please make sure the "Experimental Web Platform features" flag is enabled.');
+            return false;
+          }
+        }

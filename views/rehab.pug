@@ -1,0 +1,15 @@
+meta(charset='UTF-8')
+title 步態網頁
+link(rel='stylesheet' type='text/css' href='/stylesheets/layout.css')
+link(rel='stylesheet' type='text/css' href='/stylesheets/bootstrap.min.css')
+script(rel='/javascripts/bootstrap.min.js')
+#wapper
+  #main
+    h1 靜態復健資訊
+  #side
+    br
+    button.btn.btn-outline-success.btn-block
+      a(onclick="javascript:window.location.href='/gait?' + ary1[1]") 步態資訊下載
+    br
+    button.btn.btn-outline-info.btn-block 
+      a(onclick="javascript:window.location.href='/fall?' + ary1[1]") 跌倒偵測

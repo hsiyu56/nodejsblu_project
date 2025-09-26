@@ -1,0 +1,61 @@
+<meta charset="UTF-8" />
+<title>步態網頁</title>
+<link rel="stylesheet" type="text/css" href="../public/stylesheets/layout.css" />
+<link rel="stylesheet" type="text/css" href="../public/stylesheets/bootstrap.min.css" />
+<script rel="../public/javascripts/nurse.js"></script>
+<script rel="../public/javascripts/bootstrap.min.js"></script>
+<!--script(rel='/javascripts/find.js')-->
+<script>
+    var url = location.href
+    if (url.indexOf('?') != -1) {
+        var ary1 = url.split('?');
+        var ary2 = ary1[1].split('&');
+        var id = ary2[0];
+        var token_user = ary2[1];
+        console.log(id)
+        console.log(token_user)
+        //if (token_user != "") {
+        //    alert("歡迎登入" + id)
+        //} else {
+        //    alert("無權限進入")
+        //    top.location.href = '/'
+        //}
+    } else {
+        //alert("無權限進入")
+        //top.location.href = '/'
+    }
+    
+</script>
+<div id="wapper">
+    <div id="main">
+        <h1>步態偵測暨跌倒救援(醫護端)</h1><img src="/images/walk.jpg" />
+        <div>
+            <form class="form-signin" id="identicalForm" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh" method="POST">
+                <h2>選擇想要查詢的病患</h2>
+                <select id="show" class="form-control" name="person" required="required">
+                    <option selected="selected" disabled="disabled" value="">選擇</option>
+                    
+                </select><button class="btn btn-lg btn-primary" type="submit">開始查詢</button>
+            </form>
+        </div>
+    </div>
+    <div id="side"><br /><button class="btn btn-outline-success btn-block"> <a href="/">離開</a></button><br />
+        <h3>請先更新病患資料再進行查詢</h3><button onclick="getdata()">更新使用者</button>
+        
+    </div>
+    <script>
+        //用AJAX調用後臺資料
+        function getdata() {
+            var data = ['data', 'data1']
+            var showing = ""
+            for (i = 0; i < data.length; i++) {
+                showing = showing + "option(value = " + i + ") " + data[i] + "\n"
+            }
+
+            console.log(showing)
+
+            var show1 = document.getElementById("show")
+            show1.innerHTML = showing
+        }
+    </script>
+</div>

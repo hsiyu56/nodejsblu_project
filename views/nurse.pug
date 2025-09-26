@@ -1,0 +1,127 @@
+meta(charset='UTF-8')
+title 步態網頁
+link(rel='stylesheet' type='text/css' href='/stylesheets/layout.css')
+link(rel='stylesheet' type='text/css' href='/stylesheets/bootstrap.min.css')
+script(rel='/javascripts/nurse.js')
+script(rel='/javascripts/bootstrap.min.js')
+//script(rel='/javascripts/find.js')
+script.
+  var url = location.href
+  if(url.indexOf('?')!=-1){
+    var ary1 = url.split('?');
+    var ary2 = ary1[1].split('&');
+    var id = ary2[0];
+    var token_user = ary2[1];
+    console.log(id)
+    console.log(token_user)
+    if(token_user != ""){
+      alert("歡迎登入" + id)
+    }else{
+      alert("無權限進入")
+      top.location.href ='/'
+    }
+  }else{
+    alert("無權限進入")
+    top.location.href ='/'
+  }
+#wapper
+  #main
+    h1 步態偵測暨跌倒救援(醫護端)
+    img(src='/images/walk.jpg')
+    div
+      form.form-signin#identicalForm(data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh" method="POST")
+        h2 選擇想要查詢的病患
+        select.form-control#show(name="username1" required)
+          option(selected disabled value="") 選擇
+        button.btn.btn-lg.btn-primary(type='submit' onclick="getdata1()") 開始下載
+
+  #side
+    br
+    button.btn.btn-outline-success.btn-block 
+      a(href='/') 離開
+    br
+    h3 請先更新病患資料再進行查詢
+    button(onclick="getdata()") 更新使用者
+    //- 更新使用者的按鈕
+
+    script.
+      //用AJAX調用後臺資料
+      function getdata() {
+          
+          var req = new XMLHttpRequest();
+          var url = '/nurse';
+
+          req.open('POST', url, true);
+          req.addEventListener('load',onLoad);
+          req.addEventListener('error',onError);
+
+          req.send(1);
+      }
+
+      function onLoad() {
+          var response = this.responseText;
+          users1 = response.split('"username":').toString()
+          var m = /\x7B\x2C/g
+          var n = /\x22\x7D\x2C\x7B\x22/g
+          var o = /\x5B\x7B\x22/g
+          var p = /\x22\x7D\x5D/g
+          users1 = users1.replace(m, "{").toString()
+          users1 = users1.replace(n, ",")
+          users1 = users1.replace(o, "")
+          users1 = users1.replace(p, "")
+          users1 = users1.split(",") 
+          
+          console.log(typeof(users1))
+          console.log(users1)
+
+          var showing = ""
+          for(i=0; i<users1.length; i++){
+            showing = showing + "<option value = " + i + ">" + users1[i] + "</option>\n"
+          }
+
+          var show1 = document.getElementById("show")
+          show1.innerHTML = showing
+          //var m = /username/g
+          //var n = /\x7D\x2C?\x7B/
+          //users1 = response.replace(m, "\x27username\x27")
+          //users1 = response.replace(n, "\x2C")
+          
+          //var parsedResponse = JSON.parse(users1);
+          //console.log(typeof(parsedResponse))
+          
+      }
+
+      function onError() {
+        console.log('error receiving async AJAX call');
+      }
+      
+      function getdata1() {
+          var req = new XMLHttpRequest();
+          var url = '/nurse';
+
+          req.open('GET', url, true);
+          req.addEventListener('load',onLoad1);
+          req.addEventListener('error',onError1);
+
+          req.send(2);
+      }
+      function onLoad1() {
+          var response = this.responseText;
+          users1 = response
+          
+          console.log(typeof(users1))
+          console.log(users1)
+
+          //var m = /username/g
+          //var n = /\x7D\x2C?\x7B/
+          //users1 = response.replace(m, "\x27username\x27")
+          //users1 = response.replace(n, "\x2C")
+          
+          //var parsedResponse = JSON.parse(users1);
+          //console.log(typeof(parsedResponse))
+          
+      }
+
+      function onError1() {
+        console.log('error receiving async AJAX call');
+      }

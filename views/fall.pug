@@ -1,0 +1,230 @@
+meta(charset='UTF-8')
+title 步態網頁
+link(rel='stylesheet' type='text/css' href='/stylesheets/layout.css')
+//   Bootstrap core CSS 
+link(href='/stylesheets/bootstrap.min.css' rel='stylesheet')
+link(href='/stylesheets/color.css' rel='stylesheet')
+link(href='/stylesheets/dashboard.css' rel='stylesheet')
+script(rel='/javascripts/bootstrap.min.js')
+script.
+  var url = location.href
+  var num = 0;
+  var danger = false;
+  if(url.indexOf('?')!=-1){
+    var ary1 = url.split('?');
+    var ary2 = ary1[1].split('&');
+    var userid = ary2[0];
+    var token_user = ary2[1];
+    console.log(userid)
+    console.log(token_user)
+    if(token_user != ""){
+      //alert("歡迎登入" + userid)
+    }else{
+      alert("無權限進入")
+      top.location.href ='/'
+    }
+  }else{
+    alert("無權限進入")
+    top.location.href ='/'
+  }
+#wapper
+  #main
+    h1 跌倒偵測狀態
+    br
+    form#ctrlform
+      input#service(type='hidden' value='0xFFE0')
+      input#characteristic(type='hidden' value='0xFFE1')
+      button.btn.btn-outline-success#startNotifications 按我連接
+      button.btn.btn-outline-danger#stopNotifications 停止連接
+    div.rounded.white-c
+    div 
+      br
+      textarea#log(name="read", cols="100%", rows="25%")
+      
+  #side
+    br
+    button.btn.btn-outline-success.btn-block
+      a(onclick="javascript:window.location.href='/gait?' + ary1[1]") 步態資訊下載
+    br
+    button.btn.btn-outline-info.btn-block 
+      a(href="#") 跌倒偵測
+
+script.
+  var ChromeSamples = {
+    log: function() {
+      var line = Array.prototype.slice.call(arguments).map(function(argument) {
+        return typeof argument === 'string' ? argument : JSON.stringify(argument);
+      }).join(' ');
+      
+      document.querySelector('#log').textContent += line + '\n';
+    },
+      
+    clearLog: function() {
+      document.querySelector('#log').textContent = '';
+    },
+      
+    setStatus: function(status) {
+      document.querySelector('#status').textContent = status;
+    },
+      
+    setContent: function(newContent) {
+      var content = document.querySelector('#content');
+      while(content.hasChildNodes()) {
+        content.removeChild(content.lastChild);
+      }
+      content.appendChild(newContent);
+    }
+  };
+script.
+  var connectacc = 0;
+  var num = 0;
+  var myCharacteristic;
+      
+  async function onStartButtonClick() {
+    let serviceUuid = document.querySelector('#service').value;
+    if (serviceUuid.startsWith('0x')) {
+      serviceUuid = parseInt(serviceUuid);
+    }
+      
+    let characteristicUuid = document.querySelector('#characteristic').value;
+    if (characteristicUuid.startsWith('0x')) {
+      characteristicUuid = parseInt(characteristicUuid);
+    }
+      
+    try {
+      log('要求連接藍芽中...');
+      const device = await navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]});
+
+      log('Connecting to GATT Server...');
+      const server = await device.gatt.connect();
+      
+      log('Getting Service...');
+      const service = await server.getPrimaryService(serviceUuid);
+      
+      log('Getting Characteristic...');
+      myCharacteristic = await service.getCharacteristic(characteristicUuid);
+
+      await myCharacteristic.startNotifications();
+
+      log('連接成功!');
+      
+      log('> Notifications started');
+      myCharacteristic.addEventListener('characteristicvaluechanged',handleNotifications);
+
+      connectacc = 1;
+    } catch(error) {
+      //log('Argh! ' + error);
+      log('連接失敗，請重新再試一次哦~');
+    }
+  }
+
+  async function onStopButtonClick() {
+    if (myCharacteristic) {
+      try {
+        await myCharacteristic.stopNotifications();
+        log('停止連接');
+        connectacc = false;
+        myCharacteristic.removeEventListener('characteristicvaluechanged',handleNotifications);
+        alert("這次行走了" + num + "步" + "感謝使用本產品")
+        top.location.href = '/'
+      } catch(error) {
+        log('Argh! ' + error);
+      }
+    }
+  }
+      
+  function handleNotifications(event) {
+
+    let value = event.target.value;
+    let utf8decoder = new TextDecoder();
+
+    // Convert raw data bytes to hex values just for the sake of showing something.
+    // In the "real" world, you'd use data.getUint8, data.getUint16 or even
+    // TextDecoder to process raw data bytes.
+    var data = utf8decoder.decode(value);
+    var data1 = data.split(',');
+    var data2 = data1[2].split('c');
+    var data3 = data1[3].split('a');
+    //console.log(data1, data2, data3);
+    if(data2[1] == 1){
+      num = parseInt(data2[1]) + num;
+    }
+    
+    if(data3[1] == "f"){
+      danger = 1;
+    }
+    if(connectacc == 0){
+      return(num);
+    }
+    var pr = data1[0].toString();
+    var pr2 = data1[1].toString();
+    var pr3 = pr + "," + pr2
+    upload(userid, pr3, num, danger)
+    //console.log(userid, pr3, num, danger)
+    log(data1[0]);
+  }
+script.
+  document.querySelector('#startNotifications').addEventListener('click', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+      
+    if (isWebBluetoothEnabled()) {
+      ChromeSamples.clearLog();
+      onStartButtonClick();
+    }
+  });
+  document.querySelector('#stopNotifications').addEventListener('click', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+      
+    if (isWebBluetoothEnabled()) {
+      onStopButtonClick();
+    }
+  });
+script.
+  log = ChromeSamples.log;
+      
+  function isWebBluetoothEnabled() {
+    if (navigator.bluetooth) {
+      return true;
+    } else {
+    ChromeSamples.setStatus('您的瀏覽器可能不支援\n' +
+      '請聯絡管理員');
+      return false;
+    }
+  }
+
+  function upload(options, pr3, num1, dangers) {
+    var form1 = document.createElement('form');
+    form1.id = "form1"; 
+    form1.name = "form1";
+    document.body.appendChild(form1);
+    var input1 = document.createElement("input");
+    input1.setAttribute("name", "userid")
+    input1.setAttribute("value", options)
+    var input2 = document.createElement("input");
+    input2.setAttribute("name", "log")
+    input2.setAttribute("value", pr3)
+    var input3 = document.createElement("input");
+    input3.setAttribute("name", "num")
+    input3.setAttribute("value", num1)
+    var input4 = document.createElement("input");
+    input4.setAttribute("name", "danger")
+    input4.setAttribute("value", dangers)
+
+    form1.appendChild(input1);
+    form1.appendChild(input2);
+    form1.appendChild(input3);
+    form1.appendChild(input4);
+    form1.method = "POST";
+    console.log(form1);
+    form1.submit();
+    document.body.removeChild(form1);
+  }
+
+
+  
+
+  
+  
+

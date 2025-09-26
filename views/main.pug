@@ -1,0 +1,38 @@
+html(lang="zh-haunt-TW")
+meta(charset='UTF-8')
+title 步態網頁
+link(rel='stylesheet' type='text/css' href='/stylesheets/layout.css')
+link(rel='stylesheet' type='text/css' href='/stylesheets/bootstrap.min.css')
+script(rel='/javascripts/bootstrap.min.js')
+script.
+  var url = location.href
+  if(url.indexOf('?')!=-1){
+    var ary1 = url.split('?');
+    var ary2 = ary1[1].split('&');
+    var userid = ary2[0];
+    var token_user = ary2[1];
+    console.log(userid)
+    console.log(token_user)
+    if(token_user != ""){
+      alert("歡迎登入" + userid)
+    }else{
+      alert("無權限進入")
+      top.location.href ='/'
+    }
+  }else{
+    alert("無權限進入")
+    top.location.href ='/'
+  }
+#wapper
+  #main
+    h1 步態偵測暨跌倒救援
+    p 您今天運動了嗎?
+    img(src='/images/walk.jpg')
+    
+  #side
+    br
+    button.btn.btn-outline-success.btn-block
+      a(onclick="javascript:window.location.href='/gait?' + ary1[1]") 步態資訊下載
+    br
+    button.btn.btn-outline-info.btn-block 
+      a(onclick="javascript:window.location.href='/fall?' + ary1[1]") 跌倒偵測

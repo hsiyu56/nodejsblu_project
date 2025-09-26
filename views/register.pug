@@ -1,0 +1,56 @@
+html(lang="zh_TW")
+meta(charset='utf-8')
+meta(name='viewport' content='width=device-width,initial-scale=1,shrink-to-fit=no')
+meta(name='description' content)
+meta(name='author' content='')
+meta(name='generator' content='')
+title 註冊
+//  Bootstrap core CSS 
+link(href='/stylesheets/bootstrap.min.css' rel='stylesheet')
+link(href='/stylesheets/color.css' rel='stylesheet')
+style.
+  
+  .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+  
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+  
+//  Custom styles for this template 
+link(href='/stylesheets/register.css' rel='stylesheet')
+script(src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous")
+body.blue-c
+  form.form-signin#identicalForm(data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh" method="POST")
+    div.text-center
+      img.mb-4(src='/images/Google_Contacts_icon.svg' alt width='72' height='72')
+    h1.h3.mb-3.font-weight-normal.text-center 註冊
+    label.sr-only(for='inputname') 姓名
+    input.form-control(type='name' placeholder='請輸入姓名' name="name" required autofocus)
+    label.sr-only(for='inputPhone') 電話
+    input.form-control(type='input' placeholder='請輸入電話' name="username" required autofocus)
+    label.sr-only(for='inputDate') 生日
+    input.form-control(type='date' placeholder='請輸入生日' name="birthday" required)
+    label.sr-only(for='inputGender') 性別
+    select.form-control(name="gender" required)
+      option(selected disabled value="") 選擇 
+      option(value="1") 生理男
+      option(value="2") 生理女  
+    label.sr-only(for='inputEmail') Email
+    input.form-control(type='email' placeholder='請輸入Email' name="email" required)
+    label.sr-only(for='inputPassword') 密碼
+    input#inputPassword1.form-control(type='password' placeholder='請輸入密碼' required name='password' data-bv-identical="true" data-bv-identical-field="confirmPassword" data-bv-identical-message="密碼不一樣哦!!")
+    label.sr-only(for='inputPassword') 密碼確認
+    input#inputPassword2.form-control(type='password' placeholder='請輸入密碼確認' name='confirmPassword' data-bv-identical="true" data-bv-identical-field="password" data-bv-identical-message="密碼不一樣哦!!")
+    div.text-center
+      button.btn.btn-lg.btn-primary(type='submit') 確認
+      input.btn.btn-lg.btn-danger(type='button' value='返回' onclick="location.href='/'")
+    p.mt-5.mb-3.text-center © 臺東大學
